@@ -9,8 +9,10 @@
 #include "db_parser.h"
 #include "product_parser.h"
 #include "util.h"
+#include "mydatastore.h"
 
 using namespace std;
+
 struct ProdNameSorter {
     bool operator()(Product* p1, Product* p2) {
         return (p1->getName() < p2->getName());
@@ -29,7 +31,7 @@ int main(int argc, char* argv[])
      * Declare your derived DataStore object here replacing
      *  DataStore type to your derived type
      ****************/
-    DataStore ds;
+    MyDataStore ds;
 
 
 
@@ -99,16 +101,49 @@ int main(int argc, char* argv[])
                 }
                 done = true;
             }
+            
 	    /* Add support for other commands here */
-
-
-
-
+            else if(cmd == "ADD"){
+                string user;
+                size_t num;
+                
+                //checking to make sure there are inputs to grab + actually grabbing them
+                if(ss >> user >> num){
+                  //checking if the user is valid (a valid user function was made so 
+                  //that i could access the map)
+                    if(!ds.validUser(user)|| num <1 || num > hits.size()){
+                      //if not a valid user, output an error message
+                      cout << "Invalid request" << endl;
+                    }
+                    // else if(num <1 || num > hits.size()){
+                    //   cout << "Invalid request" << endl;
+                    // }
+                    else{
+                      //if it is valid and the request is valid, then add it to the cart!
+                        ds.addToCart(user, hits[num-1]);
+                    }
+                }
+            }
+            else if(cmd == "VIEWCART"){
+                //declare a string user that the user will input as their username to view thier cart
+                string user;
+                if(ss >> user){
+                    //view cart 
+                    ds.viewCart(user);
+                }
+            }
+            else if(cmd == "BUYCART"){
+                //declare user so we can find the user's specific cart
+                string user;
+                if(ss >>user){
+                    //purchase the user's cart
+                    ds.buyCart(user);
+                }
+            }
             else {
                 cout << "Unknown command" << endl;
             }
         }
-
     }
     return 0;
 }
